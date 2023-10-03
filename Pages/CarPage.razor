@@ -1,0 +1,138 @@
+﻿@page "/car"
+@using BlazorDapper.Model;
+@inject CarService carService
+
+<div class="DiviBasicForm">
+    <div class="row">
+        <div class="col-md-4">
+            <label>Name</label>
+            <input type="text" placeholder="Car Name" @bind="@car.Name" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label>Price</label>
+            <input type="text" placeholder="Car Price" @bind="@car.Price" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label>Image</label>
+            <input type="text" placeholder="Car Image" @bind="@car.Image" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label>Description</label>
+            <input type="text" placeholder="Car Description" @bind="@car.Description" class="form-control" />
+        </div>
+        @if (IsSaveButtonVisible)
+        {
+            <div class="col-md-4">
+                <label></label>
+                <button class="btn btn-outline-success" style="margin-top : 30px;" @onclick=" SaveUpdatedItem"> Save</button>
+            </div>
+        }
+        else
+        {
+        <div class="col-md-4">
+            <label></label>
+                <button class="btn btn-outline-success" style="margin-top : 30px;" @onclick="AddItem"> Add New Car</button>
+        </div>
+        }
+
+    </div>
+</div>
+
+
+<br />
+<br />
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Description</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var carr in @cars)
+        {
+            <tr>
+                <td>@carr.Id</td>
+                <td>@carr.Name</td>
+                <td>@carr.Price</td>
+                <td>@carr.Image</td>
+
+                <td>
+                    <button class="btn btn-primary" @onclick="@(e => EditItem( carr))" style="float:left;">Edit</button>
+                    <button class="btn btn-danger" @onclick="@(e => DeleteCar(@carr.Id))" style="margin-left: 5px; float:left;">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code{
+    IEnumerable<Car>cars;
+    Car car = new Car();
+    private int EditId;
+    protected override void OnInitialized()
+    {
+        cars = carService.GetAllCars();
+    }
+    
+    public void AddItem()
+
+    {
+        carService.InsertCar(car);
+        car.Name = string.Empty;
+        car.Price = string.Empty;
+        car.Image = string.Empty;
+        car.Description = string.Empty;
+        cars = carService.GetAllCars();
+    }
+
+
+    private void EditItem(Car item)
+    {
+        car.Name = item.Name;
+        car.Image = item.Image;
+        car.Price = item.Price;
+        car.Description = item.Description;
+        IsSaveButtonVisible = true;
+        EditId = item.Id;
+
+
+
+    }
+
+    private void DeleteCar(int Id)
+    {
+        carService.DeleteCar(Id);
+
+        cars = carService.GetAllCars();
+    }
+
+
+
+    private bool IsSaveButtonVisible = false;
+
+    private void  SaveUpdatedItem()
+    {
+        var newUpdatedData = new Car { Description = car.Description, Name = car.Name, Image = car.Image, Price = car.Price, Id = EditId };
+
+        carService.UpdateCar(newUpdatedData);
+        cars = carService.GetAllCars();
+        
+        IsSaveButtonVisible = false;
+
+    }
+
+    
+
+
+
+
+
+
+    
+}

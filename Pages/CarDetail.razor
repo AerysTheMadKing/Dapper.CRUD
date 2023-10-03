@@ -1,0 +1,17 @@
+﻿@page "/car/{id:int}"
+@using BlazorDapper.Model;
+@inject CarService carService
+<h3>CarDetail</h3>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    IEnumerable<Car> cars;
+
+    protected override void OnInitialized()
+    {
+        cars = carService.GetDetailCar();
+    }
+}
